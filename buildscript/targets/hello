@@ -1,0 +1,6 @@
+
+DESC='saying hello'
+
+COMMANDS[0]='echo hello'
+COMMANDS[1]='echo nice to meet you'
+COMMANDS[3]='echo good bye'
