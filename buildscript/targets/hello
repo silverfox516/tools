@@ -1,5 +1,7 @@
 
-DESC='saying hello'
+DESC='say hello
+\t\t  say nice to meet you
+\t\t  say good bye'
 
 COMMANDS[0]='echo hello'
 COMMANDS[1]='echo nice to meet you'
