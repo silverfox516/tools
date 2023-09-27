@@ -1,0 +1,5 @@
+
+DESC='cause error'
+
+COMMANDS[0]='ls ~'
+COMMANDS[1]='ls holahola'
