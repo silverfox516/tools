@@ -1,0 +1,4 @@
+UBOOT_CONFIG=a_uboot_defconfig
+KERNEL_CONFIG=a_kernel_defconfig
+ANDROID_TARGET=a-userdebug
+OPTIONAL_VAR=(OPT_A OPT_B OPT_C)

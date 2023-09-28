@@ -1,6 +1,6 @@
 
-DESC='say fruits'
+DESC="say fruits"
 
-COMMANDS[0]='echo apple'
-COMMANDS[1]='echo grape'
-COMMANDS[3]='echo guava'
+COMMANDS[0]="echo apple"
+COMMANDS[1]="echo grape"
+COMMANDS[3]="echo guava"

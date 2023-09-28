@@ -1,0 +1,4 @@
+
+UBOOT_CONFIG="b_uboot_defconfig"
+KERNEL_CONFIG="b_kernel_defconfig"
+ANDROID_TARGET="b-userdebug"

@@ -1,8 +1,8 @@
 
-DESC='say hello
+DESC="say hello
 \t\t  say nice to meet you
-\t\t  say good bye'
+\t\t  say good bye"
 
-COMMANDS[0]='echo hello'
-COMMANDS[1]='echo nice to meet you'
-COMMANDS[3]='echo good bye'
+COMMANDS[0]="echo hello"
+COMMANDS[1]="echo nice to meet you"
+COMMANDS[3]="echo good bye"
