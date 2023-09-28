@@ -1,0 +1,6 @@
+
+DESC="run targets"
+
+COMMANDS[0]="${BS_PRJ}_hello"
+COMMANDS[1]="${BS_PRJ}_fruits "
+COMMANDS[2]="${BS_PRJ}_use_vars"
