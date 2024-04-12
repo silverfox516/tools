@@ -108,13 +108,12 @@ FAILED=false
 while read -r dir_src dir_dst root patch; do
   git -C ${dir_dst}/${root} apply --check ${dir_src}/${root}/${patch}
   if [ $? -ne 0 ]; then
-    commit=$(get_commit_of_gitpatch ${dir_src}/${root}/${patch})
-    echo -e "failed to patch : ${CR}${dir_dst}/${root}/  ${patch}${NC}"
+    echo -e "not patchable : ${CR}${dir_dst}/${root}/  ${patch}${NC}"
     echo -e "may need : ${CB}git -C ${dir_dst}/${root}/ reset --hard HEAD@{some index}${NC}"
     echo -e "      or : ${CB}git -C ${dir_dst}/${root}/ checkout . && git -C ${dir_dst}/${root}/ clean -fd${NC}"
     FAILED=true
   else
-    echo -e "succeed to patch : ${CG}${dir_dst}/${root}/  ${patch}${NC}"
+    echo -e "patchable : ${CG}${dir_dst}/${root}/  ${patch}${NC}"
   fi
 done < ${FILE_CACHE}
 
