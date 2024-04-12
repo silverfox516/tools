@@ -1,20 +1,19 @@
 #!/bin/bash
 
-OPT_DIR_SRC=
-OPT_DIR_DST=
+DIR_SRC=
+DIR_DST=
 OPT_PREFIX=""
 
 SCRIPT_NAME=$0
 
 VERBOSE=true
-C="\033[0;92m"
+CR="\033[0;91m"
+CG="\033[0;92m"
+CB="\033[0;94m"
 NC="\033[0m"
 
 function usage()
 {
-#    echo "Usage : ./$1 [-s src_dir] [-d dst_dir] [-w] [-p prefix]"
-#    echo "   -s : directory containing patch files"
-#    echo "   -d : directory to apply patch files to"
     echo "Usage : ./$1 [-p prefix] src_dir dst_dir"
     echo "   -p : prefix of patch files to apply, if not given then patch all"
 }
@@ -25,12 +24,7 @@ function bs_fatal()
     local NC="\033[0m"
 
     echo -e "${C}'ctrl + c' to quit${NC}, $@"
-    read answer
-    if [ "${answer}" == y ]; then
-        echo -e "${C}just continue...${NC}"
-    else
-        exit 1
-    fi
+    while [ 1 ]; do sleep 5; done
 }
 
 function bs_wrapper()
@@ -62,10 +56,26 @@ function run_after_confirm()
     fi
 }
 
-while getopts 's:d:wcp:h' opt; do
+function parse_patches()
+{
+  local dir_src=$1
+  local dir_dst=$2
+  #local file=$(mktemp)
+  local file=.patch_info.txt
+  local patch_files=$(find ${dir_src} -name "${OPT_PREFIX}*patch" | sort)
+
+  > $file
+  for p in ${patch_files}; do
+    local root=$(dirname ${p})        # /a/b/src_dir/pa/th/some.patch -> /a/b/src_dir/pa/th
+    local root=${root##${dir_src}/}   # pa/th/
+    printf "%s  %s  %-40s  %s\n" $dir_src $dir_dst $root $(basename $p) >> $file
+  done
+
+  echo $file
+}
+
+while getopts 'p:h' opt; do
   case "$opt" in
-#    s) OPT_DIR_SRC=${OPTARG} ;;
-#    d) OPT_DIR_DST=${OPTARG} ;;
     p) OPT_PREFIX=${OPTARG} ;;
     ?|h) usage ${SCRIPT_NAME}; exit 1 ;;
   esac
@@ -83,26 +93,37 @@ fi
 if [ ! -d $2 ]; then
   bs_fatal "$2 is not exist or a directory"
 fi
-OPT_DIR_SRC=$(realpath $1)
-OPT_DIR_DST=$(realpath $2)
+DIR_SRC=$(realpath $1)
+DIR_DST=$(realpath $2)
 
-PATCH_FILES=$(find ${OPT_DIR_SRC} -name "${OPT_PREFIX}*patch" | sort)
+FILE_CACHE=$(parse_patches ${DIR_SRC} ${DIR_DST})
 
-cd ${OPT_DIR_DST}
 
-echo -e "${C}checking patch files whether can be patched or not...${NC}"
-for p in ${PATCH_FILES}; do
-  PATCH_ROOT=$(dirname ${p})                  # /a/b/src_dir/pa/th/some.patch -> /a/b/src_dir/pa/th
-  PATCH_ROOT=${PATCH_ROOT##${OPT_DIR_SRC}/}   # pa/th/
-  bs_wrapper git apply --check --directory=${PATCH_ROOT} ${p}
-done
+echo -e "\n${CB}list patch files selected...${NC}"
+cat ${FILE_CACHE}
 
-echo -e "${C}all patch files can be applied, apply...${NC}"
-for p in ${PATCH_FILES}; do
-  PATCH_ROOT=$(dirname ${p})                  # /a/b/src_dir/pa/th/some.patch -> /a/b/src_dir/pa/th
-  PATCH_ROOT=${PATCH_ROOT##${OPT_DIR_SRC}/}   # pa/th/
-  printf "${C}%s${NC} to ${C}%s${NC}\n" $(basename ${p}) ${PATCH_ROOT}
-  bs_wrapper git apply --directory=${PATCH_ROOT} ${p}
-done
 
-cd -
+echo -e "\n${CB}check patch files whether can be patched or not...${NC}"
+FAILED=false
+while read -r dir_src dir_dst root patch; do
+  git -C ${dir_dst}/${root} apply --check ${dir_src}/${root}/${patch}
+  if [ $? -ne 0 ]; then
+    commit=$(get_commit_of_gitpatch ${dir_src}/${root}/${patch})
+    echo -e "failed to patch : ${CR}${dir_dst}/${root}/  ${patch}${NC}"
+    echo -e "may need : ${CB}git -C ${dir_dst}/${root}/ reset --hard HEAD@{some index}${NC}"
+    echo -e "      or : ${CB}git -C ${dir_dst}/${root}/ checkout . && git -C ${dir_dst}/${root}/ clean -fd${NC}"
+    FAILED=true
+  else
+    echo -e "succeed to patch : ${CG}${dir_dst}/${root}/  ${patch}${NC}"
+  fi
+done < ${FILE_CACHE}
+
+
+if [ "${FAILED}" == "true" ]; then exit 1; fi
+
+echo -e "\n${CB}all patch files can be applied, apply...${NC}"
+while read -r dir_src dir_dst root patch; do
+  bs_wrapper git -C ${dir_dst}/${root} apply -v ${dir_src}/${root}/${patch}
+  #bs_wrapper git -C ${dir_dst}/${root} am ${dir_src}/${root}/${patch}
+done < ${FILE_CACHE}
+
