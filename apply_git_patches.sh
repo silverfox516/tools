@@ -105,8 +105,9 @@ cat ${FILE_CACHE}
 
 echo -e "\n${CB}check patch files whether can be patched or not...${NC}"
 FAILED=false
+#OPTS="--ignore-space-change --ignore-whitespace --whitespace=nowarn"
 while read -r dir_src dir_dst root patch; do
-  git -C ${dir_dst}/${root} apply --check ${dir_src}/${root}/${patch}
+  git -C ${dir_dst}/${root} apply ${OPTS} --check ${dir_src}/${root}/${patch}
   if [ $? -ne 0 ]; then
     echo -e "not patchable : ${CR}${dir_dst}/${root}/  ${patch}${NC}"
     echo -e "may need : ${CB}git -C ${dir_dst}/${root}/ reset --hard HEAD@{some index}${NC}"
