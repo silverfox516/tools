@@ -3,6 +3,7 @@
 DIR_SRC=
 DIR_DST=
 OPT_PREFIX=""
+OPT_CHECKONLY=""
 
 SCRIPT_NAME=$0
 
@@ -74,9 +75,10 @@ function parse_patches()
   echo $file
 }
 
-while getopts 'p:h' opt; do
+while getopts 'p:hc' opt; do
   case "$opt" in
     p) OPT_PREFIX=${OPTARG} ;;
+    c) OPT_CHECKONLY=true ;;
     ?|h) usage ${SCRIPT_NAME}; exit 1 ;;
   esac
 done
@@ -120,6 +122,7 @@ done < ${FILE_CACHE}
 
 
 if [ "${FAILED}" == "true" ]; then exit 1; fi
+if [ "${OPT_CHECKONLY}" == "true" ]; then exit 0; fi
 
 echo -e "\n${CB}all patch files can be applied, apply...${NC}"
 while read -r dir_src dir_dst root patch; do
