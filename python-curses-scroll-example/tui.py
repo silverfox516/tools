@@ -69,6 +69,7 @@ class Screen(object):
         curses.start_color()
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
+        curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_WHITE)
 
         self.current = curses.color_pair(2)
 
@@ -97,7 +98,7 @@ class Screen(object):
                 self.paging(self.UP)
             elif ch == curses.KEY_RIGHT:
                 self.paging(self.DOWN)
-            elif ch == curses.ascii.ESC:
+            elif ch == 0x1b:
                 break
 
     def scroll(self, direction):
