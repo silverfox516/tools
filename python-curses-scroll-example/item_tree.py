@@ -8,7 +8,7 @@ class Item():
     TYPE = 1
     DEPTH = 0
 
-    def __init__(self, item, parent):
+    def __init__(self, item, parent, tag="0"):
         self.expanded = True
         self.uuid = uuid.uuid4()
         self.item = None
@@ -16,6 +16,7 @@ class Item():
         self.parent = parent
         self.groups = []
         self.enums = []
+        self.tag = tag
         self.parse(item)
 
     def addSubItem(self, item):
@@ -48,7 +49,7 @@ class Item():
         return '%s' % (self.item)
 
     def toString(self):
-        return '%s%s %s' % ('    ' * self.DEPTH, self.itemString(), '' if len(self.sub_items) == 0 else '<' if self.isExpanded() else '>')
+        return '%10s: %s%s %s' % (self.tag, '    ' * self.DEPTH, self.itemString(), '' if len(self.sub_items) == 0 else '<' if self.isExpanded() else '>')
 
     def parse(self, item):
         self.item = item
@@ -60,7 +61,7 @@ class Item():
             return self.parent.getRoot()
 
 class ItemScreen(tui.Screen):
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self, items):
         self.root_item = items

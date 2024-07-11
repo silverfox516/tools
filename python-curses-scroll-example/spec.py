@@ -3,6 +3,7 @@
 import item_tree
 import tui
 import json
+import copy
 
 AIS = 'iap2_control_session_messages_r42.json'
 AIS_CP = 'iap2_control_session_messages_carplay_addendum_r8.json'
@@ -18,8 +19,7 @@ class Root(item_tree.Item):
 
         self.item = self.KEY
         for f in item[self.KEY]:
-            self.sub_items.append(Feature(f, self))
-
+            self.sub_items.append(Feature(f, self, self.tag))
 
 class Feature(item_tree.Item):
     TYPE = 2
@@ -28,7 +28,7 @@ class Feature(item_tree.Item):
     def parse(self, item):
         self.item = item['feature']
         for m in item['messages']:
-            self.sub_items.append(Message(m, self))
+            self.sub_items.append(Message(m, self, self.tag))
 
 class Message(item_tree.Item):
     TYPE = 3
@@ -38,7 +38,7 @@ class Message(item_tree.Item):
         self.item = item
 
         for p in self.item['parameters']:
-            self.sub_items.append(Parameter(p, self))
+            self.sub_items.append(Parameter(p, self, self.tag))
 
     def itemString(self):
         return 'id:%s source: %-9s %s ' % (self.item['id'], self.item['source'], self.item['name'])
@@ -54,7 +54,7 @@ class Parameter(item_tree.Item):
             for i in self.getRoot().groups:
                 if i['name'] == (self.item['see'] if 'see' in self.item else self.item['name']):
                     for p in i['parameters']:
-                        tmp = Parameter(p, self)
+                        tmp = Parameter(p, self, self.tag)
                         tmp.TYPE += 1
                         tmp.DEPTH += 1
                         self.sub_items.append(tmp)
@@ -63,7 +63,7 @@ class Parameter(item_tree.Item):
             for i in self.getRoot().enums:
                 if i['name'] == (self.item['see'] if 'see' in self.item else self.item['name']):
                     for p in i['values']:
-                        self.sub_items.append(Enum(p, self))
+                        self.sub_items.append(Enum(p, self, self.tag))
                     break
         self.expand(False)
 
@@ -87,11 +87,13 @@ class Enum(item_tree.Item):
 
 def main():
     ais = json.load(open(AIS))
-    ais_cp = json.load(open(AIS))
+    ais_cp = json.load(open(AIS_CP))
 
-    root_ais = Root(ais, None)
+    root_ais = Root(ais, None, "ais")
+    root_ais_cp = Root(ais_cp, None, "ais_cp")
 
-    screen = item_tree.ItemScreen(root_ais)
+    #screen = item_tree.ItemScreen(root_ais)
+    screen = item_tree.ItemScreen(root_ais_cp)
     screen.run()
 
 if __name__ == "__main__":
