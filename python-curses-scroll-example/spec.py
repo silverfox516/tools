@@ -92,8 +92,8 @@ def main():
     root_ais = Root(ais, None, "ais")
     root_ais_cp = Root(ais_cp, None, "ais_cp")
 
-    #screen = item_tree.ItemScreen(root_ais)
-    screen = item_tree.ItemScreen(root_ais_cp)
+    screen = item_tree.ItemScreen(root_ais)
+    #screen = item_tree.ItemScreen(root_ais_cp)
     screen.run()
 
 if __name__ == "__main__":
