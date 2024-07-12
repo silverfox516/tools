@@ -60,6 +60,15 @@ class Item():
         else:
             return self.parent.getRoot()
 
+    def csvString(self):
+        pass
+
+    def writeCsv(self, f):
+        f.write(self.csvString())
+        for i in self.sub_items:
+            i.writeCsv(f)
+
+
 class ItemScreen(tui.Screen):
     DEBUG = False
 

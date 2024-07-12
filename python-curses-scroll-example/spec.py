@@ -21,6 +21,21 @@ class Root(item_tree.Item):
         for f in item[self.KEY]:
             self.sub_items.append(Feature(f, self, self.tag))
 
+    def csvString(self):
+        return self.item + '\n'
+
+    def writeCsv(self, f):
+        f.write('feature,feature\n')
+        f.write('message,,id,source,name\n')
+        f.write('parameter,,,,,id,name,type,#\n')
+        f.write(self.csvString())
+        for i in self.sub_items:
+            i.writeCsv(f)
+
+    def toCsv(self, filename):
+        with open(filename, 'w') as f:
+            self.writeCsv(f)
+
 class Feature(item_tree.Item):
     TYPE = 2
     DEPTH = 1
@@ -29,6 +44,9 @@ class Feature(item_tree.Item):
         self.item = item['feature']
         for m in item['messages']:
             self.sub_items.append(Message(m, self, self.tag))
+
+    def csvString(self):
+        return ',%s\n' % (self.item)
 
 class Message(item_tree.Item):
     TYPE = 3
@@ -43,13 +61,16 @@ class Message(item_tree.Item):
     def itemString(self):
         return 'id:%s source: %-9s %s ' % (self.item['id'], self.item['source'], self.item['name'])
 
+    def csvString(self):
+        return ',,%s,%s,%s\n' % (self.item['id'], self.item['source'], self.item['name'])
+
 class Parameter(item_tree.Item):
     TYPE = 4
     DEPTH = 3
 
     def parse(self, item):
         self.item = item
-        
+ 
         if self.item['type'] == 'group':
             for i in self.getRoot().groups:
                 if i['name'] == (self.item['see'] if 'see' in self.item else self.item['name']):
@@ -70,9 +91,8 @@ class Parameter(item_tree.Item):
     def itemString(self):
         return 'id:%2s %-50s type:%-10s #:%s' % (self.item['id'], self.item['name'], self.item['type'], self.item['#'])
 
-class Group(item_tree.Item):
-    TYPE = 5
-    DEPTH = 4
+    def csvString(self):
+        return ',,,,,%s,%s,%s,%s,%s\n' % (self.item['id'], self.item['name'], self.item['type'], self.item['#'], self.item['see'] if 'see' in self.item else '')
 
 class Enum(item_tree.Item):
     TYPE = 6
@@ -85,6 +105,9 @@ class Enum(item_tree.Item):
     def itemString(self):
         return 'value:%2d description:%s' % (self.item['value'], self.item['desc'])
 
+    def csvString(self):
+        return ',,,,,,,,,%s,%s\n' % (self.item['value'], self.item['desc'])
+
 def main():
     ais = json.load(open(AIS))
     ais_cp = json.load(open(AIS_CP))
@@ -92,9 +115,12 @@ def main():
     root_ais = Root(ais, None, "ais")
     root_ais_cp = Root(ais_cp, None, "ais_cp")
 
-    screen = item_tree.ItemScreen(root_ais)
+    #screen = item_tree.ItemScreen(root_ais)
     #screen = item_tree.ItemScreen(root_ais_cp)
-    screen.run()
+    #screen.run()
+
+    root_ais.toCsv('ais_r42.csv')
+    root_ais_cp.toCsv('ais_cp_r8.csv')
 
 if __name__ == "__main__":
     main()
