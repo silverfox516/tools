@@ -13,7 +13,7 @@ class Type(Enum):
     GROUP = 6
 
 class SpecItem(menu_item.Item):
-    CSV_PREFIX = { 0:'', 1:',', 2:',,', 3:',,,,,', 4:',,,,,,,,,' }
+    CSV_PREFIX = { 0:'', 1:',', 2:',,', 3:',,,,,', 4:',,,,,,,,,', 5:',,,,,,,,,,,,,' }
 
     def csv_string(self):
         pass
@@ -32,11 +32,10 @@ class Root(SpecItem):
     def parse_item(self, item):
         self.item = item['name']
         self.revision = item['revision']
-        for i in item['features']:
-            self.add_subitem(Feature(i, parent=self, tag=self.get_tag(), depth=(self.get_depth() + 1)))
-
         self.groups = item['groups']
         self.enums = item['enums']
+        for i in item['features']:
+            self.add_subitem(Feature(i, parent=self, tag=self.get_tag(), depth=(self.get_depth() + 1)))
 
     def item_string(self):
         return '%s, %s' % (self.item, self.revision)
@@ -96,14 +95,14 @@ class Parameter(SpecItem):
                 if i['name'] == self.see:
                     for i in i['parameters']:
                         self.add_subitem(Parameter(i, parent=self, tag=self.get_tag(), depth=(self.get_depth() + 1)))
-                break
+                    break
         elif self.type == 'enum':
             self.see = item['see'] if 'see' in item else self.name
             for i in self.get_root().enums:
                 if i['name'] == self.see:
                     for i in i['values']:
                         self.add_subitem(Enum(i, parent=self, tag=self.get_tag(), depth=(self.get_depth() + 1)))
-                break
+                    break
         self.expand(True)
 
     def item_string(self):
