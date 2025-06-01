@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+VERBOSE=true
+
 function is_array()
 {
     local variable_name=$1
@@ -80,3 +82,36 @@ function add_path()
 		var=$2:${var}
 	fi
 }
+
+function log_dbg()
+{
+    local C="\033[1;44m"
+    local NC="\033[0m"
+
+    echo -e ${C}$@${NC}
+}
+
+function log_fatal()
+{
+    local C="\033[1;31m"
+    local NC="\033[0m"
+
+    echo -e "${C}'ctrl + c' to quit${NC}, $@"
+    while [ 1 ]; do sleep 5; done
+}
+
+function cmd_wrapper()
+{
+    local C="\033[1;34m"
+    local NC="\033[0m"
+
+    if [ "${VERBOSE}" == "true" ]; then
+        echo -e "run : ${C}$@${NC}"
+    fi
+
+    eval "$@"
+    if [ $? -eq 0 ]; then return; fi
+
+    bs_fatal "failed $@"
+}
+

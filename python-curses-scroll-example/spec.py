@@ -115,12 +115,12 @@ def main():
     root_ais = Root(ais, None, "ais")
     root_ais_cp = Root(ais_cp, None, "ais_cp")
 
-    #screen = item_tree.ItemScreen(root_ais)
-    #screen = item_tree.ItemScreen(root_ais_cp)
-    #screen.run()
+    screen = item_tree.ItemScreen(root_ais)
+    screen = item_tree.ItemScreen(root_ais_cp)
+    screen.run()
 
-    root_ais.toCsv('ais_r42.csv')
-    root_ais_cp.toCsv('ais_cp_r8.csv')
+    #root_ais.toCsv('ais_r42.csv')
+    #root_ais_cp.toCsv('ais_cp_r8.csv')
 
 if __name__ == "__main__":
     main()

@@ -113,7 +113,7 @@ fi
 # patch
 declare -A GIT_INIT_COMMITS
 FAILED=false
-#OPTS="--ignore-space-change --ignore-whitespace --whitespace=nowarn"
+OPTS="--ignore-space-change --ignore-whitespace --whitespace=nowarn"
 
 while read -r dir_src dir_dst root patch; do
     target_git=${dir_dst}/${root}
@@ -126,7 +126,7 @@ while read -r dir_src dir_dst root patch; do
         cd - > /dev/null
     fi
 
-    bs_wrapper git -C ${dir_dst}/${root} am ${dir_src}/${root}/${patch}
+    bs_wrapper git -C ${dir_dst}/${root} am ${OPTS} ${dir_src}/${root}/${patch}
     if [ $? -ne 0 ]; then
         bs_wrapper git -C ${dir_dst}/${root} am --abort
         FAILED=true

@@ -96,7 +96,8 @@ class Parameter(SpecItem):
                     for i in i['parameters']:
                         self.add_subitem(Parameter(i, parent=self, tag=self.get_tag(), depth=(self.get_depth() + 1)))
                     break
-        elif self.type == 'enum':
+        else:
+        #elif self.type == 'enum':
             self.see = item['see'] if 'see' in item else self.name
             for i in self.get_root().enums:
                 if i['name'] == self.see:
@@ -139,6 +140,7 @@ def main():
 
     #l = []
     #l = root_ais.make_item_list(l)
+    #l = root_ais_cp_add.make_item_list(l)
     #for t in l:
     #    print(t)
 
